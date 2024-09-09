@@ -66,14 +66,6 @@ router.get('/content-types', async (_, res) => {
   }
 });
 
-router.get('/categories', async (_, res) => {
-  try {
-    const categories = await Category.find({});
-    res.status(200).json(categories);
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
-  }
-});
 
 router.get('/:id/content-types', async (req, res) => {
   try {
@@ -86,6 +78,38 @@ router.get('/:id/content-types', async (req, res) => {
   } catch (error) {
     console.error('Error fetching content types:', error);
     res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.post('/contents', upload.fields([
+  { name: 'files', maxCount: 10 }
+]), async (req, res) => {
+  try {
+    const { name, description, category, creator } = req.body;
+    const files = (req.files as { [fieldname: string]: Express.Multer.File[] })['files'] || [];
+    
+    if (!name || !category || !creator) return res.status(400).json({ message: 'Missing required fields' });
+
+    let urls: string[] = [];
+    if (typeof req.body.urls === 'string') {
+      try {
+        urls = JSON.parse(req.body.urls);
+      } catch (error) {
+        return res.status(400).json({ message: 'Invalid URL format' });
+      }
+    }
+
+    const categoryDoc = await Category.findById(category).exec();
+    if (!categoryDoc) return res.status(400).json({ message: 'Invalid category' });
+
+    const filePaths = (files as Express.Multer.File[]).map(file => file.path);
+
+    const content = new Content({ name, description, urls, files: filePaths, category, creator });
+    await content.save();
+
+    res.status(201).json({ content });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -120,5 +144,7 @@ router.post('/contents', upload.fields([
     res.status(500).json({ message: error.message });
   }
 });
+
+
 
 export default router;

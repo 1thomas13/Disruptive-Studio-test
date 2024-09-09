@@ -33,3 +33,8 @@ apiClientWithToken.interceptors.request.use(
   }
 );
 
+export const normalizeImageUrl = (imageUrl: string) => {
+  const baseUrl = import.meta.env.VITE_API_URL;
+  const normalizedPath = imageUrl.replace(/\\/g, '/');
+  return `${baseUrl}/${normalizedPath}`;
+}

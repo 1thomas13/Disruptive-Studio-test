@@ -41,7 +41,7 @@ export const ThematicForm = () => {
         console.log(`${key}: ${value}`);
       }
 
-      await apiClientWithToken.post('/admin/categories', formData, {
+      await apiClientWithToken.post('/categories', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -144,7 +144,7 @@ export const ThematicForm = () => {
             type="submit"
             className="w-full px-4 py-2 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-600 rounded-md hover:bg-blue-500 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40"
           >
-            Create Category
+            Crear Tematica
           </button>
         </form>
       </Modal>

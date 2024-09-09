@@ -48,7 +48,7 @@ export const ContentForm = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await apiClientWithToken.get('/admin/categories');
+      const response = await apiClientWithToken.get('/categories');
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
