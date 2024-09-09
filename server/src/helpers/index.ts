@@ -1,12 +1,6 @@
 import { Content } from "../models";
 import multer from 'multer'
 
-function isImageUrl(url: string): boolean {
-  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
-  const extension = url.split('.').pop()?.toLowerCase();
-  return extension ? imageExtensions.includes(extension) : false;
-}
-
 export const getCountsForCategory = async (category?: string)  =>{
   try {
     let contents;
@@ -23,14 +17,20 @@ export const getCountsForCategory = async (category?: string)  =>{
 
     contents.forEach(content => {
       content.urls.forEach(url => {
-        if (isImageUrl(url)) {
+        linksCount++;
+      });
+    });
+
+    contents.forEach(content => {
+      content.files.forEach(url => {
+        const extension = url?.split('.').pop()?.toLowerCase() || '';
+        const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'];
+        if (imageExtensions.includes(extension)) {
           imagesCount++;
         } else {
-          linksCount++;
+          filesCount++;
         }
       });
-
-      filesCount += content.files.length;
     });
 
     return {

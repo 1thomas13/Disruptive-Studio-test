@@ -3,7 +3,7 @@ import ContentCounter from "../components/ContentCounter";
 import { apiClient } from "../utils";
 import { ContentModal } from "../components/modal/ContentModal";
 import { ICategory, IContentItem } from "../interface";
-import { Card } from "../components/Card";
+import Card from "../components/Card";
 
 function Home() {
   const [content, setContent] = useState([])
@@ -17,6 +17,7 @@ function Home() {
   useEffect(() => {
     (async () => {
       const [content, categories] = await Promise.all([apiClient('/content'), apiClient('/categories')])
+      console.log(content, categories)
       setContent(content.data)
       setFilteredContent(content.data);
       setCategories(categories.data)
@@ -78,7 +79,6 @@ function Home() {
               ))}
             </select>
           </div>
-
           <div className="rounded-md bg-slate-200 text-w font-medium p-4 mt-4">
             <ContentCounter selectedCategory={selectedCategory} categoryName={categories?.find(category => category._id === selectedCategory)?.name || ''} />
           </div>

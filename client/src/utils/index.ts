@@ -37,6 +37,10 @@ export const normalizeImageUrl = (imageUrl: string) => {
    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-expect-error
   const baseUrl = import.meta.env.VITE_API_URL;
-  const normalizedPath = imageUrl.replace(/\\/g, '/');
+
+  // Normaliza el camino de la imagen, reemplazando barras invertidas con barras y codifica la URL
+  const normalizedPath = encodeURI(imageUrl.replace(/\\/g, '/'));
+
+  // Devuelve la URL completa
   return `${baseUrl}/${normalizedPath}`;
-}
+};

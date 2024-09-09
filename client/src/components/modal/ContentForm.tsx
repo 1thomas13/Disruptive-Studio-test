@@ -21,6 +21,7 @@ export const ContentForm = () => {
   const [isFileAllowed, setIsFileAllowed] = useState(false);
   const [isImageAllowed, setIsImageAllowed] = useState(false);
   const [rawUrls, setRawUrls] = useState('');
+  const [contentTypes, setContentTypes] = useState<IContentType[]>([]);
   const { user: userData } = useUserStore((state) => state)
 
   useEffect(() => {
@@ -44,7 +45,8 @@ export const ContentForm = () => {
 
   const fetchContentTypesForCategory = async (categoryId: string) => {
     try {
-      const response = await apiClientWithToken.get(`/admin/${categoryId}/content-types`);
+      const response = await apiClientWithToken.get(`/categories/${categoryId}/contentType`);
+      setContentTypes(response.data);
       const contentTypes = response.data as IContentType[];
       setAvailableContentTypes(contentTypes);
       setIsUrlAllowed(contentTypes.some(type => type.isUrl));
@@ -114,15 +116,15 @@ export const ContentForm = () => {
           const fileExtension = file.name.split('.').pop()?.toLowerCase() || '';
 
           if (allowImages && IMAGE_EXTENSIONS.includes(fileExtension)) return true
-          if (documentContentType?.fileExtension) return documentContentType.fileExtension.includes(fileExtension);
-          if (!documentContentType?.fileExtension) return true
+          if (documentContentType && documentContentType?.fileExtension) return documentContentType.fileExtension.includes(fileExtension);
+          if (documentContentType && !documentContentType?.fileExtension) return true
           return false
         });
 
         if (!filesAreValid) throw Error(`Some files do not meet the allowed extensions.`)
       }
 
-      await apiClientWithToken.post('/admin/contents', formData, {
+      await apiClientWithToken.post('/content', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -132,6 +134,7 @@ export const ContentForm = () => {
       setIsUrlAllowed(false);
       setIsFileAllowed(false);
       setIsImageAllowed(false);
+      window.location.reload();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       alert(error.message)
@@ -152,7 +155,9 @@ export const ContentForm = () => {
         <h3 className="text-lg font-medium leading-6 text-gray-800 capitalize" id="modal-title">
           Crear Contenido
         </h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        tipos de contenido aceptados: <br />
+        <span className='text-red-700 font-bold '>{contentTypes.map(e => ` ${e.name} `)}</span>
+        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div>
             <label htmlFor="category" className="block text-sm font-medium text-gray-700">
               Categoría

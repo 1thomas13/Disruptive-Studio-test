@@ -39,10 +39,11 @@ export const TypeOfContentForm = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     try {
       e.preventDefault()
-      await apiClientWithToken.post('admin/content-types',
+      await apiClientWithToken.post('/contentType',
         { ...formValues, isUrl: formValues.type === 'url', isImage: formValues.type === 'image', isDocument: formValues.type === 'document' }
       )
       setIsModalOpen(false)
+      window.location.reload();
     } catch (error) {
       console.log(error)
       alert(error)

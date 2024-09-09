@@ -2,9 +2,9 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import authRoutes from './routes/users'; 
-import contentTypesRoutes from './routes/contentTypes';
 import categoriesRoutes from './routes/categories'; 
 import contentRoutes from './routes/content';
+import contentTypes from './routes/contentTypes';
 import cors from 'cors';
 import path from 'path';
 import { Server } from 'socket.io';
@@ -38,11 +38,9 @@ mongoose.connect(mongoDB)
     console.error('Connection error:', error);
   });
 
-
-
 app.use('/api/users', authRoutes);
 app.use('/api/categories', categoriesRoutes);
-app.use('/api/contentType', contentTypesRoutes);
+app.use('/api/contentType', contentTypes);
 app.use('/api/content', contentRoutes);
 app.use('/api/uploads', express.static(path.join(__dirname, '../uploads')));
 app.get('/', (_,res) => res.send('OK'))

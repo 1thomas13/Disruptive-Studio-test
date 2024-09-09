@@ -11,9 +11,10 @@ export const ContentModal = ({ isModalOpen, setIsModalOpen, contentId }: { isMod
     if (contentId) {
       (async () => {
         try {
-          const response = await apiClientWithToken(`/admin/contents/${contentId}`);
+          const response = await apiClientWithToken(`/content/${contentId}`);
           setContent(response.data);
         } catch (error) {
+          alert(error)
           console.error('Error fetching content:', error);
         }
       })();
@@ -22,7 +23,7 @@ export const ContentModal = ({ isModalOpen, setIsModalOpen, contentId }: { isMod
 
   return (
     <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-      <div className="p-6">
+      <div className="p-6 relative ">
         {content ? (
           <>
             <h3 className="text-xl font-medium leading-6 text-gray-800 capitalize" id="modal-title">
@@ -37,7 +38,7 @@ export const ContentModal = ({ isModalOpen, setIsModalOpen, contentId }: { isMod
                   <ul>
                     {content.urls.map((url: string, index: number) => (
                       <li key={index}>
-                        <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+                        <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline block">
                           {url}
                         </a>
                       </li>

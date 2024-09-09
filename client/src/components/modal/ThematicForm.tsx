@@ -17,7 +17,7 @@ export const ThematicForm = () => {
   useEffect(() => {
     const fetchContentTypes = async () => {
       try {
-        const response = await apiClientWithToken.get('/admin/content-types');
+        const response = await apiClientWithToken.get('/contentType');
         setAvailableContentTypes(response.data);
       } catch (error) {
         console.error('Error fetching content types:', error);
@@ -44,6 +44,7 @@ export const ThematicForm = () => {
       });
 
       setIsModalOpen(false)
+      window.location.reload();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Error creating category:', error);

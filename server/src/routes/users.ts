@@ -18,14 +18,26 @@ router.post('/', async (req, res) => {
   }
 
   try {
+    const existingUserByEmail = await User.findOne({ email });
+    if (existingUserByEmail) {
+      return res.status(400).json({ error: 'Email already in use' });
+    }
+
+    const existingUserByUsername = await User.findOne({ username });
+    if (existingUserByUsername) {
+      return res.status(400).json({ error: 'Username already in use' });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ username, email, password: hashedPassword, role });
     await user.save();
+
     res.status(201).send('User registered');
   } catch (error) {
     res.status(500).send('Error registering user');
   }
 });
+
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -75,6 +87,7 @@ router.get('/me', authenticateUser(['user', 'creator', 'admin']), async (req: an
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     res.json({
+      id: user._id,
       username: user.username,
       email: user.email,
       role: user.role

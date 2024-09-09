@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+const apiUrl = import.meta.env.VITE_API_URL;
 
-const socket = io('http://localhost:3000', {
+const baseUrl = apiUrl.endsWith('/api') ? apiUrl.slice(0, -'/api'.length) : apiUrl;
+
+const socket = io(baseUrl, {
   transports: ['websocket'],
 });
 
@@ -16,7 +21,6 @@ const ContentCounter: React.FC<{ selectedCategory: string | null, categoryName: 
 
   useEffect(() => {
     const handleCountsUpdate = (data: ICount) => {
-      console.log('Received counts update:', data);
       setCounts(data);
     };
 

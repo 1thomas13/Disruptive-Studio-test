@@ -4,11 +4,9 @@ import { authenticateUser } from '../middlewares';
 import mongoose from 'mongoose';
 import fs from 'fs';
 import upload from '../helpers';
-
 const router = express.Router();
-router.use(authenticateUser(['admin']));
 
-router.get('/:id/content-types', authenticateUser(['admin', 'creator']), async (req, res) => {
+router.get('/:id/contentType', authenticateUser(['admin', 'creator']), async (req, res) => {
   try {
     const category = await Category.findById(req.params.id).populate('contentTypes');
     if (!category) {
@@ -49,7 +47,7 @@ router.post('/', authenticateUser(['admin']), upload.single('image'), async (req
   }
 });
 
-router.get('', async (_, res) => {
+router.get('/', async (_, res) => {
   try {
     const categories = await Category.find({});
     res.status(200).json(categories);
