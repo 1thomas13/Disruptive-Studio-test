@@ -34,6 +34,8 @@ apiClientWithToken.interceptors.request.use(
 );
 
 export const normalizeImageUrl = (imageUrl: string) => {
+   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
   const baseUrl = import.meta.env.VITE_API_URL;
   const normalizedPath = imageUrl.replace(/\\/g, '/');
   return `${baseUrl}/${normalizedPath}`;

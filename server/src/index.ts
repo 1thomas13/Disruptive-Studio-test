@@ -1,22 +1,30 @@
-// src/index.ts
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import authRoutes from './routes/users'; 
-import adminRoutes from './routes/admin';
+import contentTypesRoutes from './routes/contentTypes';
+import categoriesRoutes from './routes/categories'; 
+import contentRoutes from './routes/content';
 import cors from 'cors';
 import path from 'path';
-import { Category, Content } from './models';
-
+import { Server } from 'socket.io';
+import { createServer } from 'http';
+import { getCountsForCategory } from './helpers';
 dotenv.config();
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server);
+const PORT = 3000;
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
 
 const mongoDB = process.env.MONGODB_URI;
-
 if (!mongoDB) {
   console.error('MONGODB_URI is not defined in .env file');
   process.exit(1);
@@ -30,64 +38,33 @@ mongoose.connect(mongoDB)
     console.error('Connection error:', error);
   });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use((req, res, next) => {
-  console.log(`Request URL: ${req.url}`);
-  next();
-});
+
 
 app.use('/api/users', authRoutes);
-app.use('/api/admin', adminRoutes);
+app.use('/api/categories', categoriesRoutes);
+app.use('/api/contentType', contentTypesRoutes);
+app.use('/api/content', contentRoutes);
 app.use('/api/uploads', express.static(path.join(__dirname, '../uploads')));
-
-const PORT = 3000;
-
-app.get('/api/admin/contents/:id', async (req, res) => {
-  try {
-    const content = await Content.findById(req.params.id)
-      .populate('category', 'name imageUrl')
-      .populate('creator', 'username');
-
-    if (!content) return res.status(404).json({ message: 'Content not found' });
-
-    res.status(200).json(content);
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
-  }
-})
-
-app.get('/api/contents', async (req, res) => {
-  try {
-    const contents = await Content.find()
-      .populate({
-        path: 'category',
-        select: 'name imageUrl'
-      })
-      .populate({
-        path: 'creator',
-        select: 'username'
-      })
-      .select('name category creator');
-
-    res.status(200).json(contents);
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-
-app.get('/api/categories', async (_, res) => {
-  try {
-    const categories = await Category.find({});
-    res.status(200).json(categories);
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
 app.get('/', (_,res) => res.send('OK'))
 
-app.listen(PORT, () => {
+io.on('connection', (socket) => {
+  console.log('New client connected');
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
+
+  socket.on('requestCounts', async (selectedCategory) => {
+    try {
+      const counts = await getCountsForCategory(selectedCategory);
+      socket.emit('countsUpdate', counts);
+    } catch (error) {
+      console.error('Error handling requestCounts:', error);
+      socket.emit('countsUpdate', { imagesCount: 0, linksCount: 0, filesCount: 0 });
+    }
+  });
+});
+
+server.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

@@ -1,12 +1,12 @@
-import { RegisterForm } from "../components/RegisterForm";
-import { LoginForm } from "../components/LoginForm";
 import useUserStore from "../store";
 import { Outlet } from 'react-router-dom';
-import { ContentForm } from "./ContentForm";
-import { ThematicForm } from "./ThematicForm";
 import { useEffect } from "react";
-import { TypeOfContentForm } from "./TypeOfContentForm";
 import { apiClient } from "../utils";
+import { ThematicForm } from "./modal/ThematicForm";
+import { TypeOfContentForm } from "./modal/TypeOfContentForm";
+import { ContentForm } from "./modal/ContentForm";
+import { RegisterForm } from "./modal/RegisterForm";
+import { LoginForm } from "./modal/LoginForm";
 
 export const Layout = () => {
   const { user: userData, setUser } = useUserStore((state) => state)

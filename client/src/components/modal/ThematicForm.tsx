@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import Modal from './Modal';
-import { apiClientWithToken } from '../utils';
+import { apiClientWithToken } from '../../utils';
+import Modal from '.';
 interface ContentType {
   _id: string;
   name: string;
@@ -37,10 +37,6 @@ export const ThematicForm = () => {
       formData.append('contentTypes', JSON.stringify(contentTypes));
       if (image) formData.append('image', image);
 
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-      }
-
       await apiClientWithToken.post('/categories', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -48,6 +44,7 @@ export const ThematicForm = () => {
       });
 
       setIsModalOpen(false)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Error creating category:', error);
       alert(error.message)

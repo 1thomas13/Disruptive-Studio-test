@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import Modal from './Modal';
-import { apiClientWithToken } from '../utils';
+import { apiClientWithToken } from '../../utils';
+import Modal from '.';
 interface FormValues {
   name: string;
   description?: string;
@@ -83,7 +83,7 @@ export const TypeOfContentForm = () => {
             <label htmlFor="description" className="block text-sm font-medium text-gray-700">
               Descripcion (optional)
             </label>
-            <textarea
+            <input
               id="description"
               name="description"
               value={formValues.description || ''}

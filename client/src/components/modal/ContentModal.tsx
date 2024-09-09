@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
-import Modal from './Modal';
-import { apiClient, apiClientWithToken, normalizeImageUrl } from '../utils';
+import { apiClientWithToken } from '../../utils';
+import { normalizeImageUrl } from '../../utils';
+import { IContentItem } from '../../interface';
+import Modal from '.';
 
-export const ContentModal = ({ isModalOpen, setIsModalOpen, contentId }: { isModalOpen: boolean, setIsModalOpen: (arg: boolean) => void, contentId: string }) => {
-  const [content, setContent] = useState<any | null>(null);
+export const ContentModal = ({ isModalOpen, setIsModalOpen, contentId }: { isModalOpen: boolean, setIsModalOpen: (arg: boolean) => void, contentId: string | null }) => {
+  const [content, setContent] = useState<IContentItem | null>(null);
 
   useEffect(() => {
     if (contentId) {
@@ -59,7 +61,7 @@ export const ContentModal = ({ isModalOpen, setIsModalOpen, contentId }: { isMod
                 </div>
               )}
 
-              <p className="mb-2"><strong>Créditos:</strong> {content.creator.name}</p>
+              <p className="mb-2"><strong>Créditos:</strong> {content.creator.username}</p>
               <p className="mb-2"><strong>Categoría:</strong> {content.category.name}</p>
               <img
                 src={normalizeImageUrl(content.category.imageUrl)}

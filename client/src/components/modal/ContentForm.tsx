@@ -1,23 +1,9 @@
 import { useMemo, useEffect, useState } from 'react'
-import Modal from './Modal';
-import { apiClientWithToken } from '../utils';
-import useUserStore from '../store';
+import useUserStore from '../../store';
+import { apiClientWithToken } from '../../utils';
+import Modal from '.';
+import { ICategory, IContentType } from '../../interface';
 const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-interface Category {
-  _id: string;
-  name: string;
-}
-
-interface ContentType {
-  _id: string;
-  name: string;
-  isUrl: boolean;
-  isDocument: boolean;
-  isImage: boolean;
-  fileExtension: string;
-  domain: string;
-  description: string;
-}
 
 export const ContentForm = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,8 +14,9 @@ export const ContentForm = () => {
     files: [] as File[],
     category: '',
   });
-  const [availableContentTypes, setAvailableContentTypes] = useState<ContentType[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+
+  const [availableContentTypes, setAvailableContentTypes] = useState<IContentType[]>([]);
+  const [categories, setCategories] = useState<ICategory[]>([]);
   const [isUrlAllowed, setIsUrlAllowed] = useState(false);
   const [isFileAllowed, setIsFileAllowed] = useState(false);
   const [isImageAllowed, setIsImageAllowed] = useState(false);
@@ -58,7 +45,7 @@ export const ContentForm = () => {
   const fetchContentTypesForCategory = async (categoryId: string) => {
     try {
       const response = await apiClientWithToken.get(`/admin/${categoryId}/content-types`);
-      const contentTypes = response.data as ContentType[];
+      const contentTypes = response.data as IContentType[];
       setAvailableContentTypes(contentTypes);
       setIsUrlAllowed(contentTypes.some(type => type.isUrl));
       setIsFileAllowed(contentTypes.some(type => type.isDocument));
@@ -80,7 +67,7 @@ export const ContentForm = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
-      setFormValues({ files: filesArray });
+      setFormValues({ ...formValues, files: filesArray });
     }
   };
 
@@ -101,7 +88,8 @@ export const ContentForm = () => {
     formData.append('description', formValues.description);
     formData.append('category', formValues.category);
     formData.append('urls', JSON.stringify(urls));
-    formData.append('creator', userData?.id);
+    const userId = userData?.id || '';
+    formData.append('creator', userId);
 
     if (formValues.files.length > 0) {
       formValues.files.forEach((file) => {
@@ -111,7 +99,7 @@ export const ContentForm = () => {
 
     try {
       if (formValues.urls && formValues.urls.length > 0) {
-        const contentType = availableContentTypes.find((type: ContentType) => type.isUrl)
+        const contentType = availableContentTypes.find((type: IContentType) => type.isUrl)
         if (contentType?.domain) {
           const isValid = formValues.urls.every((url) => url.includes(contentType.domain))
           if (!isValid) throw new Error(`Invalid Format to be ${contentType.domain}`)
@@ -144,6 +132,7 @@ export const ContentForm = () => {
       setIsUrlAllowed(false);
       setIsFileAllowed(false);
       setIsImageAllowed(false);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       alert(error.message)
       console.error('Error creating content:', error.message);
