@@ -1,7 +1,8 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
-import User from '../models/index'; 
-import jwt from 'jsonwebtoken';
+import {User} from '../models'; 
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import { authenticateUser } from '../middlewares';
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'All fields are required' });
   }
 
-  if (!['user', 'admin'].includes(role)) {
+  if (!['user', 'admin', 'creator'].includes(role)) {
     return res.status(400).json({ error: 'Invalid role' });
   }
 
@@ -27,14 +28,14 @@ router.post('/', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
-  if (!username || !password) {
+  if (!email || !password) {
     return res.status(400).json({ error: 'Username and password are required' });
   }
 
   try {
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ email });
 
     if (!user) return res.status(401).json({ error: 'Invalid credentials' });
     
@@ -64,5 +65,23 @@ router.post('/login', async (req, res) => {
   }
 });
 
+
+router.get('/me', authenticateUser(['user', 'creator', 'admin']), async (req: any, res) => {
+  try {
+    const { id } = req.user as JwtPayload;
+
+    const user = await User.findById(id);
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    res.json({
+      username: user.username,
+      email: user.email,
+      role: user.role
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching user data' });
+  }
+});
 
 export default router;
