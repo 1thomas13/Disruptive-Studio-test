@@ -1,4 +1,4 @@
-import { normalizeImageUrl } from '../utils'; // Asegúrate de que la ruta sea correcta
+import { normalizeImageUrl } from '../utils';
 import { IContentItem } from '../interface';
 
 interface ICardProps {

@@ -38,9 +38,7 @@ export const normalizeImageUrl = (imageUrl: string) => {
   // @ts-expect-error
   const baseUrl = import.meta.env.VITE_API_URL;
 
-  // Normaliza el camino de la imagen, reemplazando barras invertidas con barras y codifica la URL
   const normalizedPath = encodeURI(imageUrl.replace(/\\/g, '/'));
 
-  // Devuelve la URL completa
   return `${baseUrl}/${normalizedPath}`;
 };
